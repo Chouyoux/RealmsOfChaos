@@ -30,5 +30,10 @@ public class Regions {
 			reg_update.add(r.toDB());
 		MongoDatabase.updateRegions(reg_update);
 	}
+	
+	public static void updateBanner() {
+		for (Region r : regions.values())
+			r.updateBanners();
+	}
 
 }

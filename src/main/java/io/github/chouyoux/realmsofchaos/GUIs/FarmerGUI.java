@@ -1,9 +1,6 @@
 package io.github.chouyoux.realmsofchaos.GUIs;
 
-import java.util.ArrayList;
-
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,10 +8,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import io.github.chouyoux.realmsofchaos.RealmsOfChaos;
 import io.github.chouyoux.realmsofchaos.entities_handlers.RoCPlayers;
+import io.github.chouyoux.realmsofchaos.ruleset.GradesRuleset;
 
 public class FarmerGUI implements InventoryHolder, Listener {
     private Inventory inv;
@@ -38,25 +35,8 @@ public class FarmerGUI implements InventoryHolder, Listener {
     public void initializeItems(String structure, Player player) {
     	double current_food = RoCPlayers.getStructureFood(structure, player);
     	for (int i = 0 ; i < current_food ; i++) {
-    		inv.addItem(new ItemStack(Material.APPLE));
+    		inv.addItem(new ItemStack( GradesRuleset.defensive.get(player.getLevel()) ));
     	}
-    }
-
-    // Nice little method to create a gui item with a custom name, and description
-    @SuppressWarnings("unused")
-	private ItemStack createGuiItem(Material material, String name, String...lore) {
-        ItemStack item = new ItemStack(material, 1);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(name);
-        ArrayList<String> metaLore = new ArrayList<String>();
-
-        for(String loreComments : lore) {
-            metaLore.add(loreComments);
-        }
-
-        meta.setLore(metaLore);
-        item.setItemMeta(meta);
-        return item;
     }
 
     // You can open the inventory with this
@@ -75,7 +55,7 @@ public class FarmerGUI implements InventoryHolder, Listener {
         ItemStack clickedItem = e.getCurrentItem();
 
         // verify current item is not null
-        if (clickedItem == null || clickedItem.getType() != Material.APPLE) return;
+        if (clickedItem == null) return;
         
         int nb_food = clickedItem.getAmount();
         p.getInventory().addItem(new ItemStack(clickedItem));

@@ -3,7 +3,9 @@ package io.github.chouyoux.realmsofchaos.entities_handlers;
 import static io.github.chouyoux.realmsofchaos.RealmsOfChaos.getInstance;
 
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Horse;
+import org.bukkit.entity.Player;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -21,10 +23,24 @@ public class RoCHorses {
 		return h_foundvalue;
 	}
 
-	public static void setOwner(Horse h, String playerName) {
+	public static void setOwner(Horse h, String playerUUID) {
 		NamespacedKey key = new NamespacedKey(RealmsOfChaos.getInstance(), "Owner");
 		PersistentDataContainer container = h.getPersistentDataContainer();
-		container.set(key, PersistentDataType.STRING, playerName);
+		container.set(key, PersistentDataType.STRING, playerUUID);
+	}
+	
+	public static Horse getPlayerHorse(Player p) {
+		for (Entity entity : p.getWorld().getEntities()) {
+        	if (entity instanceof Horse && RoCHorses.getOwner((Horse) entity).compareTo(p.getUniqueId().toString()) == 0)
+        		return ((Horse) entity);
+        }
+		return null;
+	}
+	
+	public static void killPlayerHorse(Player p) {
+        Horse ancient_horse = RoCHorses.getPlayerHorse(p);
+        if (ancient_horse != null)
+        	ancient_horse.setHealth(0);
 	}
 	
 }

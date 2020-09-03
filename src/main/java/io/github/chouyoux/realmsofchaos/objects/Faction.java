@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.Villager.Type;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -16,6 +17,7 @@ import com.mongodb.DBObject;
 
 import de.tr7zw.nbtapi.NBTEntity;
 import io.github.chouyoux.realmsofchaos.entities_handlers.RoCNPC;
+import io.github.chouyoux.realmsofchaos.ruleset.FactionRuleset;
 import io.github.chouyoux.realmsofchaos.util.LocSerialization;
 
 public class Faction {
@@ -39,14 +41,14 @@ public class Faction {
 	
 	public Faction(DBObject o) {
 		this.name = (String) o.get("name");
-		this.spawn = LocSerialization.getLiteLocationFromString((String) o.get("spawn"));
+		this.spawn = LocSerialization.getLocationFromString((String) o.get("spawn"));
 		this.spawnRegion = (String) o.get("spawnRegion");
 		this.playersUuids = new ArrayList<String>();
 		for (Object str : ((BasicDBList) o.get("playersUuids")) )
 			playersUuids.add((String)str);
 		this.npcLocations = new HashMap<String, Location>();
 		for (Entry<String, Object> e : ((BasicBSONObject) o.get("npcLocations")).entrySet() ) {
-			Location npc_loc = LocSerialization.getLiteLocationFromString((String) e.getValue());
+			Location npc_loc = LocSerialization.getLocationFromString((String) e.getValue());
 			npcLocations.put(e.getKey(), npc_loc);
 		}
 		this.npcs = new ArrayList<LivingEntity>();
@@ -55,12 +57,12 @@ public class Faction {
 	public BasicDBObject toDB() {
 		BasicDBObject o = new BasicDBObject();
 		o.put("name", this.name);
-		o.put("spawn", LocSerialization.getLiteStringFromLocation(this.spawn));
+		o.put("spawn", LocSerialization.getStringFromLocation(this.spawn));
 		o.put("spawnRegion", this.spawnRegion);
 		o.put("playersUuids", this.playersUuids.toArray());
 		BasicBSONObject npclocs = new BasicBSONObject();
 		for (Entry<String, Location> e : this.npcLocations.entrySet())
-			npclocs.put(e.getKey(),LocSerialization.getLiteStringFromLocation(e.getValue()));
+			npclocs.put(e.getKey(),LocSerialization.getStringFromLocation(e.getValue()));
 		o.put("npcLocations", npclocs);
 		return o;
 	}
@@ -70,20 +72,21 @@ public class Faction {
 			String npc_name = e.getKey();
 			Location npc_loc = e.getValue();
 			Villager npc = (Villager) npc_loc.getWorld().spawnEntity(npc_loc, EntityType.VILLAGER);
-			if (getName().compareTo("Greeks") == 0)
-				npc.setProfession(Villager.Profession.LIBRARIAN);
-			else if (getName().compareTo("Persians") == 0)
-				npc.setProfession(Villager.Profession.CARTOGRAPHER);
-			else if (getName().compareTo("Egyptians") == 0)
-				npc.setProfession(Villager.Profession.CLERIC);
+			if (getName().equals("Greeks"))
+				npc.setVillagerType(Type.PLAINS);
+			else if (getName().equals("Persians"))
+				npc.setVillagerType(Type.SAVANNA);
+			else if (getName().equals("Egyptians"))
+				npc.setVillagerType(Type.DESERT);
 			RoCNPC.setFaction(npc, getName());
-	        npc.setCustomName(npc_name);
+	        npc.setCustomName(FactionRuleset.factionChatMsgColors.get(name)+npc_name);
 	        npc.setCustomNameVisible(true);
 	        npc.setRemoveWhenFarAway(false);
 	        npc.setInvulnerable(true);
 	        NBTEntity nbtent = new NBTEntity(npc);
 	        nbtent.setBoolean("NoAI", true);
 	        npcs.add(npc);
+	        npc.getWorld().setChunkForceLoaded(npc.getLocation().getChunk().getX(), npc.getLocation().getChunk().getZ(), true);
 		}
 	}
 	

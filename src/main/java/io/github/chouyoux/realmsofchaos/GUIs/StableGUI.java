@@ -1,9 +1,8 @@
 package io.github.chouyoux.realmsofchaos.GUIs;
 
-import java.util.ArrayList;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.attribute.Attribute;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Horse;
@@ -14,11 +13,15 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import io.github.chouyoux.realmsofchaos.RealmsOfChaos;
 import io.github.chouyoux.realmsofchaos.entities_handlers.RoCHorses;
+import io.github.chouyoux.realmsofchaos.entities_handlers.RoCNPC;
 import io.github.chouyoux.realmsofchaos.entities_handlers.RoCPlayers;
+import io.github.chouyoux.realmsofchaos.ruleset.FactionRuleset;
+import io.github.chouyoux.realmsofchaos.ruleset.GradesRuleset;
+import io.github.chouyoux.realmsofchaos.util.ArmorColors;
+import io.github.chouyoux.realmsofchaos.util.UtilFuncs;
 
 public class StableGUI implements InventoryHolder, Listener {
     private Inventory inv;
@@ -41,26 +44,10 @@ public class StableGUI implements InventoryHolder, Listener {
     // You can call this whenever you want to put the items in
     public void initializeItems(String structure, Player player) {
     	double current_horse = RoCPlayers.getStructureHorse(structure, player);
-    	if (current_horse < 1) return;
-    	for (int i = 0 ; i < current_horse ; i++) {
-    		inv.addItem(createGuiItem(Material.SADDLE, "Claim mount"));
+    	if (current_horse < 2) return;
+    	for (int i = 0 ; i < current_horse ; i+=2) {
+    		inv.addItem(UtilFuncs.createGuiItem(Material.SADDLE, "§fClaim Mount", null));
     	}
-    }
-
-    // Nice little method to create a gui item with a custom name, and description
-    private ItemStack createGuiItem(Material material, String name, String...lore) {
-        ItemStack item = new ItemStack(material, 1);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(name);
-        ArrayList<String> metaLore = new ArrayList<String>();
-
-        for(String loreComments : lore) {
-            metaLore.add(loreComments);
-        }
-
-        meta.setLore(metaLore);
-        item.setItemMeta(meta);
-        return item;
     }
 
     // You can open the inventory with this
@@ -83,20 +70,23 @@ public class StableGUI implements InventoryHolder, Listener {
         
         inv.remove(clickedItem);
         
-        double current_horses = RoCPlayers.getStructureHorse(structure, p);
-        RoCPlayers.setStructureHorse(structure, p, Math.max(0, current_horses-1));
+        RoCPlayers.setStructureHorse(structure, p, 0);
         
         Horse horse = (Horse) p.getWorld().spawnEntity(p.getLocation(), EntityType.HORSE);
+        RoCNPC.setFaction(horse, RoCPlayers.getFaction(p));
         horse.getInventory().setSaddle(new ItemStack(Material.SADDLE, 1));
+        horse.getInventory().setArmor(new ItemStack(Material.LEATHER_HORSE_ARMOR));
+        ArmorColors.updateArmorColor(horse, RoCPlayers.getFaction(p));
+        horse.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED).setBaseValue( GradesRuleset.stableSpeed.get(p.getLevel()) );
+        horse.getAttribute(Attribute.HORSE_JUMP_STRENGTH).setBaseValue( GradesRuleset.stableJump.get(p.getLevel()) );
+        horse.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue( GradesRuleset.stableHealth.get(p.getLevel()) );
         horse.setTamed(true);
         horse.setOwner(p);
+        horse.setAI(false);
+        horse.setCustomName(FactionRuleset.factionChatMsgColors.get(RoCPlayers.getFaction(p))+p.getName()+"'s Horse");
         horse.addPassenger(p);
         
-        for (Entity entity : p.getWorld().getEntities()) {
-        	if (entity instanceof Horse && RoCHorses.getOwner((Horse) entity).compareTo(p.getDisplayName()) == 0)
-        		((Horse) entity).setHealth(0);
-        }
-        
-        RoCHorses.setOwner(horse, p.getDisplayName());
+        RoCHorses.killPlayerHorse(p);
+        RoCHorses.setOwner(horse, p.getUniqueId().toString());
     }
 }

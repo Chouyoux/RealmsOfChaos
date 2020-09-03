@@ -11,7 +11,7 @@ import com.mongodb.MongoClient;
 
 public class MongoDatabase {
 
-	private static List<DBObject> structures;
+    private static List<DBObject> structures;
 	private static List<DBObject> regions;
 	private static List<DBObject> factions;
     private static MongoClient mc;
@@ -19,7 +19,7 @@ public class MongoDatabase {
 
     @SuppressWarnings("deprecation")
 	public MongoDatabase(){
-        mc = new MongoClient();
+		mc = new MongoClient();
         mcserverdb = mc.getDB("RealmsOfChaos");
     }
     

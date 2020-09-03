@@ -82,9 +82,9 @@ public class ProjectilesHandler implements Listener{
 			return;
 		}
 		Trident trident = (Trident) event.getEntity();
-		trident.setPickupStatus(PickupStatus.CREATIVE_ONLY);
+		trident.setPickupStatus(PickupStatus.DISALLOWED);
 		PlayerInventory inventory = shooter.getInventory();
-		inventory.setItemInMainHand(tridentMap.get(shooter));
+		inventory.setItem(0, tridentMap.get(shooter));
 		int load_ticks = (int) ((25) / (RoCPlayers.getPhysicalATKSPD(shooter)*1.25));
 		shooter.setCooldown(Material.TRIDENT, load_ticks);
 	}
@@ -92,6 +92,7 @@ public class ProjectilesHandler implements Listener{
 	@EventHandler
 	public void onLoadingTrident(PlayerInteractEvent event) {
 		if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if (event.getItem() == null) return;
 		if (event.getItem().getType() != Material.TRIDENT) return;
 		Player player = event.getPlayer();
 		tridentMap.put(player, event.getItem());
@@ -100,6 +101,7 @@ public class ProjectilesHandler implements Listener{
 	@EventHandler
 	public void onLoadingBow(PlayerInteractEvent event) {
 		if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if (event.getItem() == null) return;
 		if (event.getItem().getType() != Material.BOW) return;
 		Player player = event.getPlayer();
 		PlayerInventory inventory = player.getInventory();
@@ -114,6 +116,7 @@ public class ProjectilesHandler implements Listener{
 	@EventHandler
 	public void onLoadingCrossbow(PlayerInteractEvent event) {
 		if (event.getAction() != Action.RIGHT_CLICK_AIR && event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+		if (event.getItem() == null) return;
 		if (event.getItem().getType() != Material.CROSSBOW) return;
 		Player player = event.getPlayer();
 		PlayerInventory inventory = player.getInventory();
@@ -129,7 +132,7 @@ public class ProjectilesHandler implements Listener{
 	        public void run() {
 	    		if (inventory.getItemInMainHand().equals(item) && inventory.getItemInOffHand().getType() == Material.ARROW) {
 	    			item_meta.addChargedProjectile(new ItemStack(Material.ARROW, 1));
-	    			inventory.getItemInOffHand().setAmount(inventory.getItemInOffHand().getAmount()-1);
+	    			//inventory.getItemInOffHand().setAmount(inventory.getItemInOffHand().getAmount()-1);
 	    			item.setItemMeta(item_meta);
 	    		}
 	    	}

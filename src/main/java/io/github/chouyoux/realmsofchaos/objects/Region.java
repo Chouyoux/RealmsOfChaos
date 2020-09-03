@@ -1,10 +1,14 @@
 package io.github.chouyoux.realmsofchaos.objects;
 
+import java.util.ArrayList;
+
 import org.bukkit.Location;
+import org.bukkit.block.Banner;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
+import io.github.chouyoux.realmsofchaos.util.Banners;
 import io.github.chouyoux.realmsofchaos.util.LocSerialization;
 
 public class Region {
@@ -33,12 +37,24 @@ public class Region {
 		return o;
 	}
 	
+	public void updateBanners() {
+		
+		ArrayList<Banner> banners = new ArrayList<Banner>();
+		banners.add((Banner) spawn.clone().add(2, 1, 2).getBlock().getState());
+		banners.add((Banner) spawn.clone().add(-2, 1, -2).getBlock().getState());
+		banners.add((Banner) spawn.clone().add(2, 1, -2).getBlock().getState());
+		banners.add((Banner) spawn.clone().add(-2, 1, 2).getBlock().getState());
+		
+		for (Banner banner : banners)
+			Banners.updateBanner(banner, faction);
+	}
+	
 	public String getDisplayName() {
 		String result = "";
 		String[] split = name.split("_");
 		for (String str : split)
 			result += str.substring(0, 1).toUpperCase() + str.substring(1) + " ";
-		return result;
+		return result.substring(0, result.length()-1);
 	}
 
 	public String getName() {

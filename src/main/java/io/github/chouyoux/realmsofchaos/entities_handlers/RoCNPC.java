@@ -39,7 +39,23 @@ public class RoCNPC {
 		return e_foundvalue;
 	}
 	
+	public static String getFaction(Entity e) {
+		NamespacedKey key = new NamespacedKey(getInstance(), "Faction");
+	    PersistentDataContainer e_container = e.getPersistentDataContainer();
+	    String e_foundvalue = "";
+	    if(e_container.has(key , PersistentDataType.STRING)) {
+	    	e_foundvalue = e_container.get(key, PersistentDataType.STRING);
+	    }
+		return e_foundvalue;
+	}
+	
 	public static void setFaction(LivingEntity e, String f) {
+		NamespacedKey key = new NamespacedKey(RealmsOfChaos.getInstance(), "Faction");
+		PersistentDataContainer container = e.getPersistentDataContainer();
+		container.set(key, PersistentDataType.STRING, f);
+	}
+	
+	public static void setFaction(Entity e, String f) {
 		NamespacedKey key = new NamespacedKey(RealmsOfChaos.getInstance(), "Faction");
 		PersistentDataContainer container = e.getPersistentDataContainer();
 		container.set(key, PersistentDataType.STRING, f);
@@ -66,6 +82,10 @@ public class RoCNPC {
 	}
 	
 	public static boolean sameFaction(LivingEntity e1, LivingEntity e2) {
+		return (RoCNPC.getFaction(e1).compareTo(RoCNPC.getFaction(e2)) == 0);
+	}
+	
+	public static boolean sameFaction(Entity e1, Entity e2) {
 		return (RoCNPC.getFaction(e1).compareTo(RoCNPC.getFaction(e2)) == 0);
 	}
 

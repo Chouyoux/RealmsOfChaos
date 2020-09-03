@@ -1,6 +1,7 @@
 package io.github.chouyoux.realmsofchaos.listeners;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -8,6 +9,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockDamageEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 
 import io.github.chouyoux.realmsofchaos.RealmsOfChaos;
 import io.github.chouyoux.realmsofchaos.entities_handlers.RoCPlayers;
@@ -24,7 +27,7 @@ public class BuildLocks implements Listener{
 	@EventHandler
 	public void onPlaceBlock(BlockPlaceEvent event) {
 		Player player = event.getPlayer();
-		if (RoCPlayers.getClass(player).compareTo("") == 0) return;
+		if (RoCPlayers.getClass(player).equals("Builder")) return;
 		Block block = event.getBlockPlaced();
 		Location location = block.getLocation();
 		if (!(Structures.isAHeartLoc(location)) || block.getType() != Material.OBSIDIAN)
@@ -34,21 +37,36 @@ public class BuildLocks implements Listener{
 	@EventHandler
 	public void onBreakBlock(BlockBreakEvent event) {
 		Player player = event.getPlayer();
-		if (RoCPlayers.getClass(player).compareTo("") == 0) return;
+		if (RoCPlayers.getClass(player).equals("Builder")) return;
 		Block block = event.getBlock();
 		Location location = block.getLocation();
-		if (!(Structures.isAHeartLoc(location)))
+		if (!(Structures.isAHeartLoc(location)) || block.getType() != Material.OBSIDIAN)
 			event.setCancelled(true);
 	}
 	
 	@EventHandler
 	public void onDamageBlock(BlockDamageEvent event) {
 		Player player = event.getPlayer();
-		if (RoCPlayers.getClass(player).compareTo("") == 0) return;
+		if (RoCPlayers.getClass(player).equals("Builder")) return;
 		Block block = event.getBlock();
 		Location location = block.getLocation();
 		if (!(Structures.isAHeartLoc(location)))
 			event.setCancelled(true);
 	}
 
+	// ???
+	@EventHandler
+	public void onPlaceBlockCountThem(BlockPlaceEvent event) {
+        Player eventPlayer = event.getPlayer();
+        NamespacedKey key = new NamespacedKey(main, eventPlayer.getUniqueId()+"NbBlockPlaced");
+        PersistentDataContainer container = eventPlayer.getPersistentDataContainer();
+        int foundValue = -1;
+        if(container.has(key , PersistentDataType.INTEGER)) {
+            foundValue = container.get(key, PersistentDataType.INTEGER);
+        }
+        foundValue++;
+        container.set(key, PersistentDataType.INTEGER, foundValue);
+        //Bukkit.broadcastMessage(eventPlayer.getDisplayName()+" has placed "+Integer.toString(foundValue)+" blocks.");
+	}
+	
 }

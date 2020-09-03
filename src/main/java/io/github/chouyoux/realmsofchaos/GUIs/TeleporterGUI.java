@@ -1,11 +1,11 @@
 package io.github.chouyoux.realmsofchaos.GUIs;
 
-import java.util.ArrayList;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -14,11 +14,12 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import io.github.chouyoux.realmsofchaos.RealmsOfChaos;
 import io.github.chouyoux.realmsofchaos.memory.Regions;
 import io.github.chouyoux.realmsofchaos.objects.Region;
+import io.github.chouyoux.realmsofchaos.ruleset.RegionIconsRuleset;
+import io.github.chouyoux.realmsofchaos.util.UtilFuncs;
 
 public class TeleporterGUI implements InventoryHolder, Listener {
     private Inventory inv;
@@ -39,27 +40,16 @@ public class TeleporterGUI implements InventoryHolder, Listener {
     // You can call this whenever you want to put the items in
     public void initializeItems(String faction) {
     	for (Entry<String, Region> region : Regions.regions.entrySet()) {
-    		if (region.getValue().getFaction().compareTo(faction) == 0)
-    			inv.addItem(createGuiItem(Material.GREEN_WOOL, region.getValue().getDisplayName(), "§aTeleports you right there"));
-    		else
-    	        inv.addItem(createGuiItem(Material.RED_WOOL, region.getValue().getDisplayName(), "§cNot available"));
+    		if (region.getKey().toLowerCase().contains("chaos")) continue;
+    		if (region.getValue().getFaction().equals(faction)) {
+    			ItemStack item = UtilFuncs.createGuiItem(Material.SLIME_BALL, region.getValue().getDisplayName(), "§aTeleports you right there");
+    			inv.addItem(RegionIconsRuleset.updateIcon(item, region.getKey()));
+    		}
+    		else {
+    			ItemStack item = UtilFuncs.createGuiItem(Material.EGG, region.getValue().getDisplayName(), "§cNot available");
+    			inv.addItem(RegionIconsRuleset.updateIcon(item, region.getKey()));
+    		}
     	}
-    }
-
-    // Nice little method to create a gui item with a custom name, and description
-    private ItemStack createGuiItem(Material material, String name, String...lore) {
-        ItemStack item = new ItemStack(material, 1);
-        ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(name);
-        ArrayList<String> metaLore = new ArrayList<String>();
-
-        for(String loreComments : lore) {
-            metaLore.add(loreComments);
-        }
-
-        meta.setLore(metaLore);
-        item.setItemMeta(meta);
-        return item;
     }
 
     // You can open the inventory with this
@@ -82,7 +72,7 @@ public class TeleporterGUI implements InventoryHolder, Listener {
         ItemStack clickedItem = e.getCurrentItem();
 
         // verify current item is not null
-        if (clickedItem == null || clickedItem.getType() == Material.AIR || clickedItem.getType() == Material.RED_WOOL) return;
+        if (clickedItem == null || clickedItem.getType() != Material.SLIME_BALL) return;
         
         Location tp_loc = new Location(null, 0, 0, 0);
         for (Region region : Regions.regions.values())
@@ -91,6 +81,10 @@ public class TeleporterGUI implements InventoryHolder, Listener {
         	}
 
         // Using slots click is a best option for your inventory click's
-        p.teleport(tp_loc);
+        if (p.getCooldown(Material.SLIME_BALL) <= 0) {
+        	p.playSound(p.getLocation(), Sound.ITEM_CHORUS_FRUIT_TELEPORT, 1f, 0.5f);
+	        p.teleport(tp_loc);
+	        p.setCooldown(Material.SLIME_BALL, 20*300);
+        }
     }
 }

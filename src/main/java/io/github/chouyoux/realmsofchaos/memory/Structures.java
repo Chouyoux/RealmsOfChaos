@@ -38,6 +38,11 @@ public class Structures {
 		}
 	}
 	
+	public static void updateBanners() {
+		for (Structure s : structures.values())
+			s.updateBanners();
+	}
+	
 	public static boolean isAHeartLoc(Location loc) {
 		for (Structure s : structures.values())
 			if (s.isAHeartLoc(loc))

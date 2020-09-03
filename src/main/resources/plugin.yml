@@ -1,73 +1,52 @@
 main: io.github.chouyoux.realmsofchaos.RealmsOfChaos
 name: RealmsOfChaos
 version: 0.0.1-SNAPSHOT
-api-version: 1.15
+api-version: 1.16
 author: Alexis (Chouyoux) Flazinska
 description: A core plugin to run the RealmOfChaos game of a Spigot Server
-depend: [WorldEdit, WorldGuard, SpigotLib, WorldGuardEvents, NBTAPI]
+depend: [WorldEdit, WorldGuard, SpigotLib, EffectLib, WorldGuardEvents, NBTAPI, GlowAPI, LibsDisguises, ProtocolLib, Citizens, Sentinel]
 commands:
-    mycommand:
-        description: An example command
-        usage: /mycommand
-        permission: roc.mycommand
-        permission-message: You don't have the myplugin.mycommand permission.
-    message:
-       description: Is boring
-       usage: /message
-       permission: roc.message
-       permission-message: You are a (boring) shit
-    setmessage:
-       description: Is boring
-       usage: /setmessage <new message>
-       permission: roc.setmessage
-       permission-message: You are a (very boring) shit
-    factionjoin:
-       description: Is boring
-       usage: /factionjoin <Egyptians|Greeks|Persians>
-       permission: roc.factionjoin
-       permission-message: You are a (very boring) shit
-    factionleave:
-       description: Is boring
-       usage: /factionleave
-       permission: roc.factionleave
-       permission-message: You are a (very boring) shit
-    factioninfo:
-       description: Is boring
-       usage: /factioninfo
-       permission: roc.factioninfo
-       permission-message: You are a (very boring) shit
-    classjoin:
-       description: Makes the sender join a class
-       usage: /classjoin
-       permission: roc.classjoin
-       permission-message: You are a (very boring) shit
-    classleave:
-       description: Is boring
-       usage: /classleave
-       permission: roc.classleave
-       permission-message: You are a (very boring) shit
-    classinfo:
-       description: Is boring
-       usage: /classinfo
-       permission: roc.classinfo
-       permission-message: You are a (very boring) shit
     roclear:
        description: Clears all entities spawned by this plugin
        usage: /roclear
        permission: roc.roclear
-       permission-message: You are a (very boring) shit
-    setstr:
-       description: Is boring
-       usage: /setstr <integer>
-       permission: roc.setstr
-       permission-message: You are a (very boring) shit
-    setdex:
-       description: Is boring
-       usage: /setdex <integer>
-       permission: roc.setdex
-       permission-message: You are a (very boring) shit
-    setvit:
-       description: Is boring
-       usage: /setvit <integer>
-       permission: roc.setvit
-       permission-message: You are a (very boring) shit
+       permission-message: You need to be OP.
+    get:
+       description: Gets a player's field's value
+       usage: /get <OnlinePlayer> <Field>
+       permission: roc.get
+       permission-message: You need to be OP.
+    set:
+       description: Sets a player's field's value
+       usage: /set <OnlinePlayer> <Field> <Value>
+       permission: roc.set
+       permission-message: You need to be OP.
+    tuto:
+       description: Teleporter a player to the tutorial
+       usage: /tuto
+    join:
+       description: Generates a request to join a player's challenge
+       usage: /join <OnlinePlayer>
+    accept:
+       description: Accept an invitation request
+       usage: /accept <OnlinePlayer>
+    challengestats:
+       description: Displays info about a player's running Challenge
+       usage: /challengestats <OnlinePlayer>
+       permission: roc.challengestats
+       permission-message: You need to be OP.
+    it:
+       description: Gives RoC materials
+       usage: /it [<OnlinePlayer>] <ID> <Amount>
+       permission: roc.it
+       permission-message: You need to be OP.
+    chaos:
+       description: Summons RoC Chaos Entities
+       usage: /chaos <ChaosMob> [<Quantity>]
+       permission: roc.chaos
+       permission-message: You need to be OP.
+    cd:
+       description: Resets all cooldowns
+       usage: /cd [<OnlinePlayer>]
+       permission: roc.cd
+       permission-message: You need to be OP.
